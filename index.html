@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Barbershop</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0F0F0F',
+                            dark: '#161616',
+                            gray: '#222222',
+                            gold: '#C6A75E',
+                            white: '#FFFFFF',
+                        }
+                    },
+                    fontFamily: {
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        opensans: ['Open Sans', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        widest: '.2em',
+                        wider: '.1em',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #0F0F0F;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+        }
+
+        p, a, span, .font-body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* Scroll Reveal Animations (Converted to Keyframes to prevent transition conflicts) */
+        @keyframes reveal-up {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .reveal.active {
+            animation-name: reveal-up;
+            animation-duration: 0.8s;
+            animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+            animation-fill-mode: forwards;
+        }
+        .reveal-delay-1 { animation-delay: 0.15s; }
+        .reveal-delay-2 { animation-delay: 0.3s; }
+        .reveal-delay-3 { animation-delay: 0.45s; }
+
+        /* Subtle Image Filters */
+        .premium-filter {
+            filter: grayscale(100%) contrast(110%);
+            transition: filter 0.5s ease;
+        }
+        .group:hover .premium-filter {
+            filter: grayscale(0%) contrast(100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F0F0F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C6A75E;
+        }
+
+        /* Inner Left-to-Right Shimmer/Ripple Animation */
+        @keyframes shimmer-slide {
+            0% { transform: translateX(-250%) skewX(-25deg); }
+            15% { transform: translateX(350%) skewX(-25deg); }
+            100% { transform: translateX(350%) skewX(-25deg); } /* Wait for the rest of the 4 seconds */
+        }
+        .animate-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .animate-ripple::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer-slide 4s infinite;
+            pointer-events: none; /* Ensure the animation overlay doesn't block clicks */
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-gold selection:text-brand-black">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-6 px-6 md:px-12 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-montserrat tracking-wider text-brand-white group flex items-center gap-2">
+                <i class="ph ph-scissors text-brand-gold text-3xl transition-transform group-hover:-rotate-45"></i>
+                The Barbershop
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8 font-opensans text-sm tracking-wider uppercase font-semibold">
+                <a href="#about" class="text-gray-300 hover:text-brand-gold transition-colors">About</a>
+                <a href="#services" class="text-gray-300 hover:text-brand-gold transition-colors">Services</a>
+                <a href="#gallery" class="text-gray-300 hover:text-brand-gold transition-colors">Gallery</a>
+                <a href="#testimonials" class="text-gray-300 hover:text-brand-gold transition-colors">Reviews</a>
+                <a href="#book" class="border border-brand-gold text-brand-gold px-6 py-2 hover:bg-brand-gold hover:text-brand-black transition-all duration-300">Book Now</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-brand-white focus:outline-none">
+                <i class="ph ph-list text-3xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-brand-black/95 backdrop-blur-md z-[100] hidden flex-col items-center justify-center gap-8 text-xl font-montserrat tracking-widest transition-opacity duration-300">
+        <button id="close-menu-btn" class="absolute top-8 right-8 text-brand-white hover:text-brand-gold">
+            <i class="ph ph-x text-4xl"></i>
+        </button>
+        <a href="#about" class="mobile-link text-white hover:text-brand-gold transition-colors">About</a>
+        <a href="#services" class="mobile-link text-white hover:text-brand-gold transition-colors">Services</a>
+        <a href="#gallery" class="mobile-link text-white hover:text-brand-gold transition-colors">Gallery</a>
+        <a href="#testimonials" class="mobile-link text-white hover:text-brand-gold transition-colors">Reviews</a>
+        <a href="#book" class="mobile-link bg-brand-gold text-brand-black px-8 py-3 mt-4 animate-ripple">Book Now</a>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=2074" alt="Barber cutting hair" class="w-full h-full object-cover object-center" />
+            <div class="absolute inset-0 bg-gradient-to-r from-brand-black/90 via-brand-black/80 to-transparent"></div>
+            <div class="absolute inset-0 bg-brand-black/40"></div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full text-center md:text-left">
+            <div class="max-w-3xl">
+                <!-- Updated Trust Badge -->
+                <p class="font-opensans text-brand-gold tracking-widest text-sm md:text-base font-semibold mb-4 reveal flex flex-col md:flex-row items-center justify-center md:justify-start gap-2">
+                    <span class="flex text-lg">
+                        <i class="ph-fill ph-star"></i>
+                        <i class="ph-fill ph-star"></i>
+                        <i class="ph-fill ph-star"></i>
+                        <i class="ph-fill ph-star"></i>
+                        <i class="ph-fill ph-star"></i>
+                    </span>
+                    <span>RATED 4.9/5 • 200 REVIEWS</span>
+                </p>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl leading-[1.1] text-brand-white mb-6 reveal reveal-delay-1 tracking-wider">
+                    Redefining <br/> Masculinity
+                </h1>
+                <p class="font-opensans text-gray-300 text-lg md:text-xl font-light mb-10 max-w-xl mx-auto md:mx-0 reveal reveal-delay-2">
+                    Precision cuts, straight blade shaves, and an uncompromising standard of excellence. Welcome to your new ritual.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start reveal reveal-delay-3">
+                    <a href="#book" class="w-full sm:w-auto bg-brand-gold text-brand-black font-montserrat font-black tracking-wider px-8 uppercase text-sm hover:bg-white transition-colors duration-300 text-center flex items-center justify-center h-14 animate-ripple">
+                        Book Appointment
+                    </a>
+                    <a href="tel:+1234567890" class="w-full sm:w-auto border border-white text-white font-montserrat font-black tracking-wider px-8 uppercase text-sm hover:border-brand-gold hover:text-brand-gold transition-colors duration-300 text-center flex items-center justify-center gap-2 h-14">
+                        <i class="ph ph-phone text-lg"></i> Call Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 md:py-32 bg-brand-black relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Text -->
+                <div class="reveal">
+                    <div class="w-16 h-1 bg-brand-gold mb-8"></div>
+                    <h2 class="text-4xl md:text-5xl tracking-wider mb-6">The Art of<br/>The Blade</h2>
+                    <div class="space-y-6 text-gray-400 font-opensans font-light leading-relaxed">
+                        <p>
+                            The Barbershop was forged from a desire to return to the roots of classic men's grooming, infused with a modern, relentless urban edge. We don't just cut hair; we sculpt confidence.
+                        </p>
+                        <p>
+                            Our master barbers are artisans of their craft, utilizing techniques passed down through generations alongside the latest trends in streetwear styling. In our matte black sanctuary, every detail is curated to provide a premium, uninterrupted escape from the city hustle.
+                        </p>
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="relative reveal reveal-delay-2 group">
+                    <div class="absolute -inset-4 border border-brand-gold/30 translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2"></div>
+                    <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=1470" alt="Barber Shop Vibe" class="relative z-10 w-full object-cover h-[500px] premium-filter" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 md:py-32 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl tracking-wider mb-4">Our Services</h2>
+                <div class="w-16 h-1 bg-brand-gold mx-auto mb-6"></div>
+                <p class="font-opensans text-gray-400 max-w-2xl mx-auto font-light">Precision grooming tailored for the modern gentleman. Experience unrivaled attention to detail.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Service Card 1 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-scissors text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$35</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Haircut</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 45 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Precision cut, tailored to your head shape and personal style. Includes hot towel neck shave, consultation, and styling advice.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal reveal-delay-1 flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-footprints text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$40</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Reflexology Session</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 30 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Targeted pressure point massage to relieve tension, reduce stress, and restore urban balance. Perfect add-on after a long week.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal reveal-delay-2 flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-user text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$25</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Beard Sculpting</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 30 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Expert trimming and shaping to define your jawline. Finished with premium beard oils and hot lather straight razor line-up.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+
+                <!-- Service Card 4 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-drop text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$45</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Complete Shave</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 45 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Traditional straight blade shave. Includes hot lathers, essential oils, soothing balms, and a cold towel finish to close pores.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+
+                <!-- Service Card 5 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal reveal-delay-1 flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-waves text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$15</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Shampoo & Rinse</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 15 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Invigorating scalp massage with luxury cleansing products to refresh, revitalize, and prepare your hair for a clean cut.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+
+                <!-- Service Card 6 -->
+                <div class="bg-brand-black border border-white/5 hover:border-brand-gold/50 p-8 transition-all duration-150 group reveal reveal-delay-2 flex flex-col h-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="ph ph-wind text-3xl text-gray-600 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="font-montserrat font-bold text-xl text-brand-gold">$25</span>
+                        </div>
+                        <h3 class="text-xl tracking-wide mb-2">Mens Wash & Style</h3>
+                        <p class="text-xs font-opensans text-gray-500 mb-4 uppercase tracking-widest"><i class="ph ph-clock mr-1"></i> 20 Mins</p>
+                        <p class="font-opensans text-sm text-gray-400 font-light mb-8">Professional wash followed by an expert blow-dry and styling using our premium matte clays or high-shine pomades.</p>
+                    </div>
+                    <a href="#book" class="block w-full text-center border border-white/20 text-white font-montserrat text-xs tracking-widest uppercase py-3 group-hover:bg-brand-gold group-hover:border-brand-gold group-hover:text-brand-black transition-all mt-auto">Book</a>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center reveal">
+                <a href="#" class="inline-flex items-center gap-2 text-white font-montserrat tracking-widest uppercase text-sm border-b border-brand-gold pb-1 hover:text-brand-gold transition-colors">
+                    View More Services <i class="ph ph-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 bg-brand-black">
+        <div class="max-w-[1400px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 reveal">
+                <div>
+                    <h2 class="text-4xl md:text-5xl tracking-wider mb-4">The Work</h2>
+                    <div class="w-16 h-1 bg-brand-gold"></div>
+                </div>
+                <p class="font-opensans text-gray-400 font-light mt-4 md:mt-0 uppercase tracking-widest text-sm">Follow <span class="text-brand-gold">@TheBarbershop</span></p>
+            </div>
+
+            <!-- Masonry Grid Layout -->
+            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6">
+                <!-- Image 1 (Portrait) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a" alt="Barber cutting" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 2 (Landscape) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-1 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033" alt="Straight Razor" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 3 (Tall Portrait) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-2 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/3356174/pexels-photo-3356174.jpeg" alt="Grooming Products" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 4 (Square) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c" alt="Barber Shop Interior" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 5 (Portrait) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-1 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/3998397/pexels-photo-3998397.jpeg" alt="Hair styling" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 6 (Landscape) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-2 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/4422102/pexels-photo-4422102.jpeg" alt="Clippers" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 7 (Tall) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/9992819/pexels-photo-9992819.jpeg" alt="Barber pole" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 8 (Square) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-1 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/2068672/pexels-photo-2068672.jpeg" alt="Client fade" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+                <!-- Image 9 (Portrait) -->
+                <a href="https://instagram.com" target="_blank" class="block relative group cursor-pointer reveal reveal-delay-2 overflow-hidden break-inside-avoid mb-6 rounded-sm">
+                    <img src="https://images.pexels.com/photos/331989/pexels-photo-331989.jpeg" alt="Beard trim" class="w-full h-auto block premium-filter" />
+                    <div class="absolute inset-0 bg-brand-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="ph ph-instagram-logo text-4xl text-brand-gold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 reveal">
+                <i class="ph-fill ph-quotes text-5xl text-brand-gold/30 mb-4 inline-block"></i>
+                <h2 class="text-4xl md:text-5xl tracking-wider mb-4">The Word</h2>
+                <div class="w-16 h-1 bg-brand-gold mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <a href="" target="_blank" class="block bg-[#111] p-8 md:p-10 border-t-2 border-brand-gold reveal transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(198,167,94,0.1)] hover:border-white flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex text-brand-gold mb-6">
+                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                        </div>
+                        <p class="font-opensans text-gray-300 font-light leading-relaxed mb-8 italic">
+                            "The absolute best fade in the city. The atmosphere is top tier, entirely matte black, and they play great tracks. It’s an experience, not just a haircut."
+                        </p>
+                    </div>
+                    <div>
+                        <p class="font-montserrat text-sm uppercase tracking-widest text-white">Marcus D.</p>
+                    </div>
+                </a>
+
+                <!-- Testimonial 2 -->
+                <a href="" target="_blank" class="block bg-[#111] p-8 md:p-10 border-t-2 border-brand-gold reveal reveal-delay-1 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(198,167,94,0.1)] hover:border-white flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex text-brand-gold mb-6">
+                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                        </div>
+                        <p class="font-opensans text-gray-300 font-light leading-relaxed mb-8 italic">
+                            "I booked the Full Service before my wedding. The straight blade shave was impeccable and the mini facial left me looking incredibly sharp. Highly recommended."
+                        </p>
+                    </div>
+                    <div>
+                        <p class="font-montserrat text-sm uppercase tracking-widest text-white">James L.</p>
+                    </div>
+                </a>
+
+                <!-- Testimonial 3 -->
+                <a href="" target="_blank" class="block bg-[#111] p-8 md:p-10 border-t-2 border-brand-gold reveal reveal-delay-2 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(198,167,94,0.1)] hover:border-white flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex text-brand-gold mb-6">
+                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                        </div>
+                        <p class="font-opensans text-gray-300 font-light leading-relaxed mb-8 italic">
+                            "Attention to detail is unmatched. They take their time, no rushing. The reflexology session was a surprising addition that I now book every time."
+                        </p>
+                    </div>
+                    <div>
+                        <p class="font-montserrat text-sm uppercase tracking-widest text-white">Tyler R.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Online Booking CTA Section -->
+    <section id="book" class="relative py-32 bg-brand-black overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-gray/20 to-transparent"></div>
+        <div class="absolute -right-20 -top-20 text-[20rem] text-white/[0.02] font-montserrat font-black leading-none pointer-events-none">
+            BLADE
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal">
+            <h2 class="text-5xl md:text-6xl tracking-wider mb-6">Claim Your Chair</h2>
+            <p class="font-opensans text-gray-400 text-lg md:text-xl font-light mb-12 max-w-2xl mx-auto">
+                Appointments are highly recommended to ensure the highest quality of service. Ready for your transformation?
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
+                <a href="#book" class="w-full sm:w-auto bg-brand-gold text-brand-black font-montserrat font-black tracking-wider px-10 uppercase text-sm hover:bg-white transition-colors duration-300 flex items-center justify-center h-16 animate-ripple">
+                    Book Appointment
+                </a>
+                <a href="tel:+1234567890" class="w-full sm:w-auto border border-white text-white font-montserrat font-black tracking-wider px-10 uppercase text-sm hover:border-brand-gold hover:text-brand-gold transition-colors duration-300 flex items-center justify-center gap-2 h-16">
+                    <i class="ph ph-phone text-lg"></i> Call Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#0A0A0A] pt-20 pb-10 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Brand -->
+                <div>
+                    <a href="#" class="text-2xl font-montserrat tracking-wider text-brand-white flex items-center gap-2 mb-6">
+                        <i class="ph ph-scissors text-brand-gold text-2xl"></i>
+                        S<span class="text-brand-gold">&</span>B
+                    </a>
+                    <p class="font-opensans text-gray-500 font-light text-sm mb-6 leading-relaxed">
+                        Premium grooming for the modern urban man. Confident, edgy, and uncompromising in quality.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full border border-gray-800 flex items-center justify-center text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-all">
+                            <i class="ph ph-instagram-logo text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-gray-800 flex items-center justify-center text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-all">
+                            <i class="ph ph-facebook-logo text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-gray-800 flex items-center justify-center text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-all">
+                            <i class="ph ph-twitter-logo text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="font-montserrat tracking-widest text-brand-white text-sm mb-6">Navigation</h4>
+                    <ul class="space-y-4 font-opensans text-gray-500 text-sm font-light">
+                        <li><a href="#about" class="hover:text-brand-gold transition-colors">About Us</a></li>
+                        <li><a href="#services" class="hover:text-brand-gold transition-colors">Our Services</a></li>
+                        <li><a href="#gallery" class="hover:text-brand-gold transition-colors">Gallery</a></li>
+                        <li><a href="#testimonials" class="hover:text-brand-gold transition-colors">Testimonials</a></li>
+                        <li><a href="#book" class="hover:text-brand-gold transition-colors">Book Online</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-montserrat tracking-widest text-brand-white text-sm mb-6">Contact</h4>
+                    <ul class="space-y-4 font-opensans text-gray-500 text-sm font-light">
+                        <li class="flex items-start gap-3">
+                            <i class="ph ph-map-pin text-brand-gold mt-1"></i>
+                            <span>124 Urban District Ave,<br/>Downtown Core, NY 10012</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="ph ph-phone text-brand-gold"></i>
+                            <a href="tel:+12125550198" class="hover:text-brand-gold transition-colors">(212) 555-0198</a>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="ph ph-envelope text-brand-gold"></i>
+                            <a href="mailto:info@TheBarbershop.com" class="hover:text-brand-gold transition-colors">info@TheBarbershop.com</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Hours -->
+                <div>
+                    <h4 class="font-montserrat tracking-widest text-brand-white text-sm mb-6">Hours</h4>
+                    <ul class="space-y-4 font-opensans text-gray-500 text-sm font-light">
+                        <li class="flex justify-between border-b border-gray-800 pb-2">
+                            <span>Mon - Thu</span>
+                            <span class="text-white">9:00 AM - 8:00 PM</span>
+                        </li>
+                        <li class="flex justify-between border-b border-gray-800 pb-2">
+                            <span>Fri - Sat</span>
+                            <span class="text-white">9:00 AM - 9:00 PM</span>
+                        </li>
+                        <li class="flex justify-between pb-2">
+                            <span>Sunday</span>
+                            <span class="text-brand-gold">Closed</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-white/5 pt-8 text-center font-opensans text-gray-600 text-xs tracking-wider">
+                <p>&copy; <span id="currentYear"></span> The Barbershop. All rights reserved. Designed for the Modern Man.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        // Set Current Year in Footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-brand-black/95', 'backdrop-blur-md', 'shadow-2xl', 'py-4');
+                navbar.classList.remove('bg-transparent', 'py-6');
+            } else {
+                navbar.classList.add('bg-transparent', 'py-6');
+                navbar.classList.remove('bg-brand-black/95', 'backdrop-blur-md', 'shadow-2xl', 'py-4');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+                setTimeout(() => { mobileMenu.style.opacity = '1'; }, 10);
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            } else {
+                mobileMenu.style.opacity = '0';
+                setTimeout(() => { 
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('flex');
+                }, 300);
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeBtn.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // Scroll Reveal Animations via Intersection Observer
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                } else {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Stop observing once revealed
+                }
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => {
+            revealOnScroll.observe(el);
+        });
+    </script>
+</body>
+</html>
